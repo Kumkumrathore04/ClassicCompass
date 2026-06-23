@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ action }} - Classic Compass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0b0b;
+        }
+
+        /* 16:9 Photography Backdrop Wrapper from image_d654a6.jpg */
+        .split-screen {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            background-image: linear-gradient(rgba(11, 11, 11, 0.4), rgba(11, 11, 11, 0.85)), url("{{ url_for('static', filename='images/login_bg.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Minimalist Frost Glass Login Card */
+        .login-card {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 45px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+
+        .brand-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #eab308;
+            text-transform: uppercase;
+            margin-bottom: 35px;
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a3a3a3;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(26, 26, 26, 0.6);
+            border: 1px solid #333333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #eab308;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #eab308;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .switch-mode {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #a3a3a3;
+        }
+
+        .switch-mode a {
+            color: #eab308;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .switch-mode a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-screen">
+        <div class="login-card">
+            
+            <!-- Branding Header -->
+            <h2 class="brand-title">Classic Compass</h2>
+            <span class="brand-subtitle">Literature Portal</span>
+
+            <!-- Dynamic Form Wrapper handles both Login / Register Routes -->
+            <form action="{% if action == 'Login' %}/login{% else %}/register{% endif %}" method="POST">
+                
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="submit-btn">{{ action }}</button>
+            </form>
+
+            <!-- Toggle links between registering an account and signing in -->
+            <div class="switch-mode">
+                {% if action == 'Login' %}
+                    Don't have an account? <a href="/register">Register here</a>
+                {% else %}
+                    Already registered? <a href="/login">Login here</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

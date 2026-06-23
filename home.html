@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Classic Compass - Literature Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+</head>
+
+<body style="background-color: #0b0b0b; font-family: 'Inter', sans-serif; margin: 0; padding: 0; color: #f5f5f5; min-height: 100vh;">
+
+    <!-- Navbar Layout -->
+    <div class="navbar" style="background-color: #111111; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222222;">
+        <div class="logo" style="display: flex; align-items: center; gap: 12px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+            <a href="/" style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #ffffff; text-decoration: none; letter-spacing: -0.5px;">CLASSICCOMPASS</a>
+        </div>
+        <div>
+            <a href="/" style="color: #ffffff; margin-right: 20px; text-decoration: none; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Home</a>
+            {% if session.get('username') %}
+                <a href="#" style="color: #eab308; margin-right: 20px; text-decoration: underline; font-weight: 700; font-size: 13px;">@{{ session['username'] }}</a>
+                <a href="/logout" style="color: #ffffff; text-decoration: none; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Logout</a>
+            {% else %}
+                <a href="/login" style="color: #ffffff; text-decoration: none; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Login</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Dynamic Canvas Backdrop Header -->
+    <div style="background-image: linear-gradient(rgba(11, 11, 11, 0.4), rgba(11, 11, 11, 0.85)), url('{{ canvas.url }}'); background-size: cover; background-position: center; padding: 80px 20px; border-bottom: 1px solid #222222; text-align: center; box-shadow: inset 0px -100px 80px #0b0b0b; position: relative;">
+        
+        <div style="width: 120px; height: 3px; background: #eab308; margin: 0 auto 20px auto;"></div>
+        <span style="font-family: 'Playfair Display', serif; font-size: 14px; letter-spacing: 4px; color: #d4d4d4; text-transform: uppercase; display: block; margin-bottom: 25px;">PENGUIN CLASSICS ARCHIVE</span>
+
+        {% if book %}
+            <!-- ONLY RENDERS ONCE ACTIVE BOOK QUERY EXECUTES -->
+            <div style="width: 160px; height: 240px; background: #1a1a1a; margin: 0 auto 20px auto; border-radius: 8px; overflow: hidden; box-shadow: 0px 10px 25px rgba(0,0,0,0.7); border: 1px solid #333; display: flex; align-items: center; justify-content: center;">
+                {% if book.cover_url and book.cover_url != '' and 'id/0-L.jpg' not in book.cover_url %}
+                    <img src="{{ book.cover_url }}" alt="Book Cover" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                    <div style="width: 100%; height: 100%; background: #111111; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 15px; box-sizing: border-box; border-top: 3px solid #eab308;">
+                        <div style="font-size: 10px; color: #888888; letter-spacing: 2px; text-transform: uppercase;">Penguin</div>
+                        <div style="font-family: 'Playfair Display', serif; font-size: 15px; color: #ffffff; font-weight: bold; line-height: 1.3;">{{ book.title }}</div>
+                        <div style="font-size: 10px; color: #eab308; letter-spacing: 1px; text-transform: uppercase;">Classic</div>
+                    </div>
+                {% endif %}
+            </div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 42px; color: #ffffff; margin: 0 0 6px 0; font-weight: 400; text-shadow: 0px 2px 8px rgba(0,0,0,0.9);">{{ book.title }}</h1>
+            <p style="font-family: 'Playfair Display', serif; font-size: 20px; color: #eab308; font-style: italic; margin: 0 0 35px 0; text-shadow: 0px 2px 4px rgba(0,0,0,0.9);">by {{ book.author }}</p>
+        {% else %}
+            <!-- INITIAL BLANK WELCOME VIEWPORT STATE -->
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 38px; color: #ffffff; margin: 0 0 10px 0; font-weight: 400;">Discover Pre-1960 Classics</h1>
+            <p style="color: #a3a3a3; font-size: 16px; margin: 0 auto 35px auto; max-width: 500px;">Enter a classic title below to open its dedicated sync room, vocabulary vault, and discussion circles.</p>
+        {% endif %}
+
+        <!-- Search Overlay Row -->
+        <div class="search-box" style="max-width: 500px; margin: 0 auto;">
+            <form action="/search" method="GET" style="display: flex; gap: 10px;">
+                <input type="text" name="query" placeholder="Search for a classic book..." required
+                       style="flex: 1; padding: 14px 20px; border: 1px solid #444; border-radius: 8px; font-size: 14px; outline: none; background: rgba(26, 26, 26, 0.9); color: white; backdrop-filter: blur(5px);">
+                <button type="submit" style="background: #eab308; color: black; border: none; padding: 0 25px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Search</button>
+            </form>
+            {% if session.get('search_error') %}
+                <div style="background: #451a03; color: #fef08a; padding: 12px; margin-top: 15px; border-radius: 8px; font-size: 13px; text-align: left; border: 1px solid #713f12;">
+                    ⚠️ {{ session.pop('search_error') }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="position: absolute; bottom: 15px; right: 20px; font-size: 11px; color: #d4d4d4; background: rgba(17, 17, 17, 0.75); padding: 5px 12px; border-radius: 4px; backdrop-filter: blur(5px); border: 1px solid #2d2d2d;">
+            🎨 Canvas Backdrop: <i>{{ canvas.title }}</i> by {{ canvas.artist }}
+        </div>
+    </div>
+
+    <!-- Workspace Deck Entry Components Grid -->
+    <div style="max-width: 1100px; margin: 40px auto; padding: 0 20px;">
+        
+        {% if book %}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div style="font-size: 13px; color: #a3a3a3; text-transform: uppercase; letter-spacing: 1.5px;">🔍 Archive Match Result</div>
+                <a href="/" style="background: transparent; color: #eab308; border: 1px solid #eab308; padding: 8px 16px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">← Clear Search</a>
+            </div>
+
+            <!-- Dynamic Countdown Badge Track -->
+            <div style="background: #121212; border: 1px solid #222; padding: 25px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+                <div style="display: flex; gap: 40px; font-size: 14px; color: #d4d4d4;">
+                    <span>👥 Room Members: <b style="color: #ffffff; margin-left: 5px;">{{ reader_count }} online</b></span>
+                    <span>⏳ Reading Cycle: <b style="color: #eab308; margin-left: 5px;">{{ days_left }}</b></span>
+                </div>
+                
+                <div style="display: flex; gap: 12px;">
+                    {% if is_joined %}
+                        <button style="background: #14532d; color: #4ade80; border: none; padding: 10px 20px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; cursor: default;">✓ Inside Circle</button>
+                    {% else %}
+                        <form action="/join_buddy/{{ book.id }}" method="POST" style="margin: 0;">
+                            <button type="submit" style="background: #eab308; color: black; border: none; padding: 10px 20px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; cursor: pointer;">Enter Room</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 40px; align-items: flex-start; margin-bottom: 60px;">
+                <!-- Dialogue Thread Module -->
+                <div style="flex: 1.6; background: #121212; border: 1px solid #222; padding: 30px; border-radius: 12px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; margin: 0 0 5px 0; color: #ffffff;">💬 Dialogue Thread</h3>
+                    <p style="color: #a3a3a3; margin: 0 0 20px 0; font-size: 13px;">Analyze themes or textual frameworks with fellow readers.</p>
+                    
+                    {% if session.get('user_id') %}
+                        <form action="/add_review/{{ book.id }}" method="POST" style="margin-bottom: 30px;">
+                            <textarea name="review_text" placeholder="Share your thoughts or structural findings here..." required 
+                                      style="width: 100%; height: 90px; padding: 15px; border: 1px solid #333; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; box-sizing: border-box; resize: vertical; margin-bottom: 12px; background: #1a1a1a; color: white;"></textarea>
+                            <button type="submit" style="background: white; color: black; border: none; padding: 10px 20px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; float: right; text-transform: uppercase;">Post Note</button>
+                            <div style="clear: both;"></div>
+                        </form>
+                    {% else %}
+                        <p style="background: #1c1917; color: #a8a29e; padding: 15px; border-radius: 8px; font-size: 13px; font-style: italic; margin-bottom: 30px; text-align: center; border: 1px solid #2c2a29;">
+                            🔒 Please <a href="/login" style="font-weight: 600; color: #eab308; text-decoration: underline;">sign in</a> to drop discussion nodes into this room.
+                        </p>
+                    {% endif %}
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        {% if reviews %}
+                            {% for review in reviews %}
+                                <div style="background: #1a1a1a; border: 1px solid #262626; padding: 15px; border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <span style="font-size: 13px; font-weight: 700; color: #eab308;">@{{ review.username }}</span>
+                                        <span style="font-size: 11px; color: #737373;">{{ review.timestamp }}</span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 14px; color: #e5e5e5; line-height: 1.5;">{{ review.review_text }}</p>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="color: #525252; font-style: italic; text-align: center; padding: 20px 0; font-size: 14px;">The dialogue is clear. Post the first entry!</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Vocabulary Vault Component -->
+                {% if session.get('user_id') %}
+                <div style="flex: 1; background: #121212; border: 1px solid #222; padding: 30px; border-radius: 12px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 5px 0; color: #ffffff;">🧠 Vocabulary Vault</h3>
+                    <p style="color: #a3a3a3; margin: 0 0 20px 0; font-size: 13px;">Log unfamiliar terminology encountered inside the work.</p>
+                    
+                    <form action="/add_word" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
+                        <input type="hidden" name="book_id" value="{{ book.id }}">
+                        <input type="text" name="word" placeholder="Advanced Word" required style="padding: 10px 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: white; font-size: 13px; outline: none;">
+                        <input type="text" name="meaning" placeholder="Definition" required style="padding: 10px 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: white; font-size: 13px; outline: none;">
+                        <button type="submit" style="background: #262626; color: white; border: 1px solid #333; padding: 10px; border-radius: 6px; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer;">Vault Entry</button>
+                    </form>
+
+                    <div style="margin-top: 25px; border-top: 1px solid #222; padding-top: 20px;">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            {% if words %}
+                                {% for w in words %}
+                                    <div style="background: #1a1a1a; padding: 10px 12px; border-radius: 6px; border: 1px solid #262626; border-left: 3px solid #eab308;">
+                                        <b style="color: #ffffff;">{{ w.word }}</b>: <span style="color: #a3a3a3;">{{ w.meaning }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p style="color: #525252; font-style: italic; text-align: center; font-size: 13px;">No terms vaulted yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- INTERACTIVE LOCKET APP RECONSTRUCTED HOMEPAGE GRID -->
+            <div>
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 26px; color: #ffffff; margin: 0 0 5px 0; text-align: left;">📖 Live Reading Grid</h2>
+                <p style="color: #a3a3a3; font-size: 14px; margin: 0 0 30px 0; text-align: left;">Real snapshots from our network's current book chapters.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+                    
+                    <!-- Core Locket Interface Frame Link Upload Widget -->
+                    <div style="background: #111111; border: 2px dashed #2d2d2d; border-radius: 24px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 300px; box-sizing: border-box;">
+                        {% if session.get('username') %}
+                            <form action="/upload_moment" method="POST" enctype="multipart/form-data" style="width: 100%; text-align: center;">
+                                <div style="margin-bottom: 15px;">
+                                    <label for="file-upload" style="cursor: pointer; background: #222; border: 1px solid #444; padding: 12px 20px; border-radius: 12px; display: inline-block; font-size: 13px; font-weight: 600; color: #eab308;">
+                                        📸 Capture Moment
+                                    </label>
+                                    <input id="file-upload" type="file" name="moment_image" accept="image/*" required style="display: none;" onchange="document.getElementById('file-chosen').innerText = this.files[0].name">
+                                    <div id="file-chosen" style="font-size: 11px; color: #737373; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No photo selected</div>
+                                </div>
+                                <input type="text" name="caption" placeholder="What does this image look like?" required
+                                       style="width: 100%; padding: 12px 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: white; font-size: 13px; outline: none; margin-bottom: 12px; box-sizing: border-box;">
+                                <button type="submit" style="background: #eab308; color: black; border: none; width: 100%; padding: 11px; border-radius: 8px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;">Beam to Feed</button>
+                            </form>
+                        {% else %}
+                            <span style="font-size: 32px; margin-bottom: 10px;">🔒</span>
+                            <p style="font-size: 13px; color: #737373; text-align: center; margin: 0; line-height: 1.5;">Please <a href="/login" style="color: #eab308; font-weight: bold; text-decoration: underline;">Login</a> to drop live snapshot snapshots onto your friends' home feeds.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- User Moments Mapping Deck -->
+                    {% if moments %}
+                        {% for moment in moments %}
+                            <div style="background: #121212; border: 1px solid #222; border-radius: 24px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 12px;">
+                                <div style="width: 100%; aspect-ratio: 1/1; background: #1a1a1a; border-radius: 18px; overflow: hidden; border: 1px solid #262626;">
+                                    <img src="{{ moment.image_url }}" alt="Shared Moment" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div style="padding: 0 4px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                        <span style="font-size: 13px; font-weight: 700; color: #eab308;">@{{ moment.username }}</span>
+                                        <span style="font-size: 10px; color: #525252;">Shared</span>
+                                    </div>
+                                    <p style="margin: 0; font-size: 13px; color: #d4d4d4; line-height: 1.4; font-style: italic;">"{{ moment.caption }}"</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Default Aesthetic Layout Elements -->
+                        <div style="background: #121212; border: 1px solid #222; border-radius: 24px; padding: 16px; opacity: 0.35; display: flex; flex-direction: column; gap: 12px;">
+                            <div style="width: 100%; aspect-ratio: 1/1; background: #1a1a1a; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 32px;">🕯️</div>
+                            <div>
+                                <span style="font-size: 13px; font-weight: 700; color: #eab308;">@System</span>
+                                <p style="margin: 5px 0 0 0; font-size: 13px; color: #737373; font-style: italic;">Waiting for the first image block to be beamed...</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
